@@ -1,19 +1,23 @@
 package com.example.eventplanner.entities;
 
+import com.example.eventplanner.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
 @Entity(name = "users")
-public class User extends BaseEntity{
+public class User extends BaseEntity implements UserDetails {
     @Email
+    @NotNull
     @Column(unique=true)
     private String email;
 
@@ -44,6 +48,34 @@ public class User extends BaseEntity{
     @OneToMany(mappedBy = "creator")
     Set<Group> createdGroups;
 
+    @Override
+    public Collection<?extends GrantedAuthority> getAuthorities() {
+        return List.of(() -> role);
+    }
 
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
 }
