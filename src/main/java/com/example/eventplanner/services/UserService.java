@@ -1,6 +1,7 @@
 package com.example.eventplanner.services;
 
 import com.example.eventplanner.dtos.UserDto;
+import com.example.eventplanner.entities.Calendar;
 import com.example.eventplanner.entities.User;
 import com.example.eventplanner.enums.Role;
 import com.example.eventplanner.exceptions.UserAlreadyExistException;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @RequiredArgsConstructor
 @Transactional()
 @Service
@@ -22,6 +25,8 @@ public class UserService {
     private UserRepository userRepository;
 
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    private final CalendarService calendarService;
 
     public void register(UserDto user) throws UserAlreadyExistException {
         if(checkIfUserExist(user.getEmail())){
@@ -59,6 +64,14 @@ public class UserService {
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(String.valueOf(Role.CLIENT));
+        Calendar calendar = calendarService.create(user);
+        user.setCalendar(calendar);
         return userRepository.save(user);
+    }
+
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(EntityNotFoundException::new);
+
     }
 }

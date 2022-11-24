@@ -17,7 +17,10 @@ public class Activity extends BaseEntity{
     String name;
 
     @NotNull
-    LocalDateTime time;
+    LocalDateTime startTime;
+
+    @NotNull
+    LocalDateTime endTime;
 
     @NotNull
     @ManyToOne
