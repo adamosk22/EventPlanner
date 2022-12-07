@@ -1,14 +1,12 @@
 package com.example.eventplanner.controllers;
 
 import com.example.eventplanner.dtos.ActivityDto;
-import com.example.eventplanner.dtos.UserDto;
 import com.example.eventplanner.services.ActivityService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,7 +26,7 @@ public class ActivityController {
 
     @GetMapping(value = "/{email}")
     @ResponseStatus(HttpStatus.OK)
-    public Page<ActivityDto> findByEmail(@PathVariable String email, @PageableDefault Pageable pageable) { return activityService.findByEmail(email, pageable); }
+    public List<ActivityDto> findByEmail(@PathVariable String email) { return activityService.findByEmail(email); }
 
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)

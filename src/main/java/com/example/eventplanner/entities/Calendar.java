@@ -20,9 +20,6 @@ public class Calendar extends BaseEntity{
     Set<Activity> activities = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "calendar")
-    Set<Routine> routines = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "calendar")
     Set<Event> events = new LinkedHashSet<>();
 
 

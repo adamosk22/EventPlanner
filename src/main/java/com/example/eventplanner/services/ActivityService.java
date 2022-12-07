@@ -5,17 +5,16 @@ import com.example.eventplanner.entities.Activity;
 import com.example.eventplanner.entities.Calendar;
 import com.example.eventplanner.entities.User;
 import com.example.eventplanner.repositories.ActivityRepository;
-import com.example.eventplanner.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Transactional()
@@ -35,7 +34,8 @@ public class ActivityService {
         LocalDateTime startDateTime = LocalDateTime.parse(dto.getStartDateTime(), formatter);
         activity.setStartTime(startDateTime);
         LocalDateTime endDateTime = LocalDateTime.parse(dto.getEndDateTime(), formatter);
-        activity.setStartTime(endDateTime);
+        activity.setEndTime(endDateTime);
+        activity.setRecurring(dto.getRecurring());
         return activityRepository.save(activity);
     }
 
@@ -49,17 +49,18 @@ public class ActivityService {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
-    public Page<ActivityDto> findByEmail(String email, @PageableDefault Pageable pageable){
+    public List<ActivityDto> findByEmail(String email){
         User user = userService.findByEmail(email);
         Calendar calendar = user.getCalendar();
-        final Page<Activity> activities = activityRepository.findByCalendar(calendar, pageable);
-        return activities.map(activity -> new ActivityDto(
+        final List<Activity> activities = activityRepository.findByCalendar(calendar);
+        return activities.stream().map(activity -> new ActivityDto(
                 activity.getStartTime().toString(),
                 activity.getEndTime().toString(),
                 activity.getName(),
                 email,
+                activity.getRecurring(),
                 activity.getId()
-        ));
+        )).collect(Collectors.toList());
     }
 
     @Transactional

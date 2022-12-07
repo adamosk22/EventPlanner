@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.List;
+
 public interface ActivityRepository extends CrudRepository<Activity, Long>, PagingAndSortingRepository<Activity,Long> {
-    public Page<Activity> findByCalendar(Calendar calendar, Pageable pageable);
+    public List<Activity> findByCalendar(Calendar calendar);
 }

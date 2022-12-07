@@ -20,10 +20,4 @@ public class UserController {
         userService.create(userDTO);
     }
 
-    @GetMapping()
-    @ResponseStatus(HttpStatus.OK)
-    public String get(){
-        return "get";
-    }
-
 }

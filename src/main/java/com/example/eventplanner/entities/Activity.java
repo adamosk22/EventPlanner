@@ -22,6 +22,8 @@ public class Activity extends BaseEntity{
     @NotNull
     LocalDateTime endTime;
 
+    Boolean recurring;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name="calendar_id")

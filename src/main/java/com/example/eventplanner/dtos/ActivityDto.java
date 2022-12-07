@@ -28,5 +28,7 @@ public class ActivityDto {
 
     String userEmail;
 
+    Boolean recurring;
+
     Long id;
 }
