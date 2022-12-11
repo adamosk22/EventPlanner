@@ -1,7 +1,5 @@
 package com.example.eventplanner.services;
 
-import com.example.eventplanner.dtos.ActivityDto;
-import com.example.eventplanner.entities.Activity;
 import com.example.eventplanner.entities.User;
 import com.example.eventplanner.repositories.CalendarRepository;
 import lombok.RequiredArgsConstructor;

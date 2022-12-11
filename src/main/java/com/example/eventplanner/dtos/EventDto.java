@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -14,27 +13,28 @@ import javax.validation.constraints.NotNull;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class EventDto {
     @NotNull
     @NotEmpty
-    private String firstName;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    String startDateTime;
 
     @NotNull
     @NotEmpty
-    private String lastName;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    String endDateTime;
 
     @NotNull
     @NotEmpty
-    private String password;
+    String name;
 
-    @NotNull
-    @NotEmpty
-    @Email
-    private String email;
+    String description;
 
-    @NotNull
-    @NotEmpty
-    private String role;
+    String location;
 
-    private String company;
+    String userEmail;
+
+    String company;
+
+    Long id;
 }

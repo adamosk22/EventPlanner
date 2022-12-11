@@ -20,4 +20,7 @@ public class UserController {
         userService.create(userDTO);
     }
 
+    @GetMapping(value = "/{email}")
+    public UserDto getUser(@PathVariable String email){ return userService.findUser(email); }
+
 }

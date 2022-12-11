@@ -63,7 +63,9 @@ public class UserService {
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(String.valueOf(Role.CLIENT));
+        user.setRole(userDTO.getRole());
+        if(user.getRole()=="ORGANIZER")
+            user.setCompany(userDTO.getCompany());
         Calendar calendar = calendarService.create(user);
         user.setCalendar(calendar);
         return userRepository.save(user);
@@ -73,5 +75,15 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(EntityNotFoundException::new);
 
+    }
+
+    public UserDto findUser(String email){
+        User user = findByEmail(email);
+        return new UserDto(user.getFirstName(),
+                user.getLastName(),
+                null,
+                user.getEmail(),
+                user.getRole(),
+                user.getCompany());
     }
 }

@@ -12,12 +12,15 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity(name = "events")
-public class Event extends BaseEntity{
+public class Event extends BaseEntity implements Comparable<Event>{
     @NotNull
     String name;
 
     @NotNull
-    LocalDateTime time;
+    LocalDateTime startTime;
+
+    @NotNull
+    LocalDateTime endTime;
 
     String description;
 
@@ -32,4 +35,12 @@ public class Event extends BaseEntity{
     @ManyToOne
     @JoinColumn(name="user_id")
     User user;
+
+    @Override
+    public int compareTo(Event e) {
+        if (getStartTime() == null || e.getStartTime() == null) {
+            return 0;
+        }
+        return getStartTime().compareTo(e.getStartTime());
+    }
 }

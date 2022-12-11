@@ -34,6 +34,8 @@ public class User extends BaseEntity implements UserDetails {
     @NotNull
     private String role;
 
+    private String company;
+
     @ManyToMany(mappedBy = "users")
     private Set<Group> groups = new LinkedHashSet<>();
 
