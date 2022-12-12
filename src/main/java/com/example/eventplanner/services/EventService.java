@@ -1,6 +1,8 @@
 package com.example.eventplanner.services;
 
 import com.example.eventplanner.dtos.EventDto;
+import com.example.eventplanner.entities.Activity;
+import com.example.eventplanner.entities.Calendar;
 import com.example.eventplanner.entities.Event;
 import com.example.eventplanner.entities.User;
 import com.example.eventplanner.repositories.EventRepository;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class EventService {
     private final EventRepository eventRepository;
     private final UserService userService;
+    private final ActivityService activityService;
 
     @Transactional
     public Event create(EventDto dto){
@@ -73,5 +76,39 @@ public class EventService {
         LocalDateTime endDateTime = LocalDateTime.parse(dto.getEndDateTime(), formatter);
         searchedEvent.setEndTime(endDateTime);
         return searchedEvent;
+    }
+
+    public List<EventDto> findByEmail(String email){
+        List <Activity> activities = activityService.findActivities(email);
+        final List<Event> events = eventRepository.findAll();
+        events.removeIf(event -> (event.getStartTime().isBefore(LocalDateTime.now())));
+        for(Activity activity : activities){
+            events.removeIf(event -> (event.getStartTime().isBefore(activity.getEndTime()) && event.getEndTime().isAfter(activity.getStartTime())));
+            events.removeIf(event -> (checkRecurringOverlap(event,activity)));
+        }
+        Collections.sort(events);
+        return events.stream().map(event -> new EventDto(
+                event.getStartTime().toString(),
+                event.getEndTime().toString(),
+                event.getName(),
+                event.getDescription(),
+                event.getLocation(),
+                event.getUser().getEmail(),
+                event.getUser().getCompany(),
+                event.getId()
+        )).collect(Collectors.toList());
+    }
+
+    private boolean checkRecurringOverlap(Event event, Activity activity){
+        if(activity.getRecurring()){
+            if(event.getStartTime().getDayOfWeek()==activity.getStartTime().getDayOfWeek()){
+                if(event.getStartTime().getHour() <= activity.getEndTime().getHour() && event.getEndTime().getHour()>=activity.getStartTime().getHour()){
+                    if(event.getStartTime().getMinute() <= activity.getEndTime().getMinute() && event.getEndTime().getMinute()>=activity.getStartTime().getMinute()){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

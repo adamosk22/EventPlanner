@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Transactional()
@@ -50,9 +49,7 @@ public class ActivityService {
     }
 
     public List<ActivityDto> findByEmail(String email){
-        User user = userService.findByEmail(email);
-        Calendar calendar = user.getCalendar();
-        final List<Activity> activities = activityRepository.findByCalendar(calendar);
+        final List<Activity> activities = findActivities(email);
         return activities.stream().map(activity -> new ActivityDto(
                 activity.getStartTime().toString(),
                 activity.getEndTime().toString(),
@@ -72,5 +69,11 @@ public class ActivityService {
         LocalDateTime endDateTime = LocalDateTime.parse(dto.getEndDateTime(), formatter);
         searchedActivity.setEndTime(endDateTime);
         return searchedActivity;
+    }
+
+    public List<Activity> findActivities(String email){
+        User user = userService.findByEmail(email);
+        Calendar calendar = user.getCalendar();
+        return activityRepository.findByCalendar(calendar);
     }
 }

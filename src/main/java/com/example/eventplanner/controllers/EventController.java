@@ -30,4 +30,8 @@ public class EventController {
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public void modify(@RequestBody EventDto eventDto) { eventService.modify(eventDto); }
+
+    @GetMapping(value="/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventDto> getByEmail(@PathVariable String email){ return eventService.findByEmail(email); }
 }
