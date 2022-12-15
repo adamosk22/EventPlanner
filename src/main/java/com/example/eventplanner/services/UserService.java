@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional()
@@ -48,14 +50,6 @@ public class UserService {
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
     }
 
-    public boolean isValidEmail(String email) {
-        // create the EmailValidator instance
-        EmailValidator validator = EmailValidator.getInstance();
-
-        // check for valid email addresses using isValid method
-        return validator.isValid(email);
-    }
-
     @Transactional
     public User create(UserDto userDTO){
         final User user = new User();
@@ -85,5 +79,15 @@ public class UserService {
                 user.getEmail(),
                 user.getRole(),
                 user.getCompany());
+    }
+
+    public List<UserDto> findByGroup(String groupName){
+        final List<User> users = userRepository.findByGroups_name(groupName);
+        return users.stream().map(user -> new UserDto(user.getFirstName(),
+                user.getLastName(),
+                null,
+                user.getEmail(),
+                user.getRole(),
+                user.getCompany())).collect(Collectors.toList());
     }
 }

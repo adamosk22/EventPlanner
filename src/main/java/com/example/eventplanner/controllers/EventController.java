@@ -34,4 +34,8 @@ public class EventController {
     @GetMapping(value="/{email}")
     @ResponseStatus(HttpStatus.OK)
     public List<EventDto> getByEmail(@PathVariable String email){ return eventService.findByEmail(email); }
+
+    @GetMapping(value="category/{category}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventDto> getByCategory(@PathVariable String category){ return eventService.findByCategory(category); }
 }

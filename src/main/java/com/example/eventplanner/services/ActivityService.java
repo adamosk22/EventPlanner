@@ -35,6 +35,7 @@ public class ActivityService {
         LocalDateTime endDateTime = LocalDateTime.parse(dto.getEndDateTime(), formatter);
         activity.setEndTime(endDateTime);
         activity.setRecurring(dto.getRecurring());
+        activity.setIsEvent(dto.getIsEvent());
         return activityRepository.save(activity);
     }
 
@@ -56,6 +57,7 @@ public class ActivityService {
                 activity.getName(),
                 email,
                 activity.getRecurring(),
+                activity.getIsEvent(),
                 activity.getId()
         )).collect(Collectors.toList());
     }

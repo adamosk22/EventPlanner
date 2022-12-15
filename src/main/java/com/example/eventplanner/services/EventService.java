@@ -1,10 +1,7 @@
 package com.example.eventplanner.services;
 
 import com.example.eventplanner.dtos.EventDto;
-import com.example.eventplanner.entities.Activity;
-import com.example.eventplanner.entities.Calendar;
-import com.example.eventplanner.entities.Event;
-import com.example.eventplanner.entities.User;
+import com.example.eventplanner.entities.*;
 import com.example.eventplanner.repositories.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -87,6 +84,20 @@ public class EventService {
             events.removeIf(event -> (checkRecurringOverlap(event,activity)));
         }
         Collections.sort(events);
+        return events.stream().map(event -> new EventDto(
+                event.getStartTime().toString(),
+                event.getEndTime().toString(),
+                event.getName(),
+                event.getDescription(),
+                event.getLocation(),
+                event.getUser().getEmail(),
+                event.getUser().getCompany(),
+                event.getId()
+        )).collect(Collectors.toList());
+    }
+
+    public List<EventDto> findByCategory(String categoryName){
+        final List<Event> events = eventRepository.findByCategories_name(categoryName);
         return events.stream().map(event -> new EventDto(
                 event.getStartTime().toString(),
                 event.getEndTime().toString(),

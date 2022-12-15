@@ -30,5 +30,7 @@ public class ActivityDto {
 
     Boolean recurring;
 
+    Boolean isEvent;
+
     Long id;
 }

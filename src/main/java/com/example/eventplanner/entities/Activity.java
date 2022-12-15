@@ -24,6 +24,8 @@ public class Activity extends BaseEntity{
 
     Boolean recurring;
 
+    Boolean isEvent;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name="calendar_id")

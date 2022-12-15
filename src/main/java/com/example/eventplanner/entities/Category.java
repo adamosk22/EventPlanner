@@ -3,26 +3,24 @@ package com.example.eventplanner.entities;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Getter
 @Setter
 @Entity(name = "categories")
 public class Category extends BaseEntity{
     @NotNull
+    @Column(unique = true)
     String name;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name="event_id")
-    Event event;
+    @ManyToMany(mappedBy = "categories")
+    Set<Event> events;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name="group_id")
-    Group group;
+    @ManyToMany(mappedBy = "categories")
+    Set<Group> group;
 
 }
