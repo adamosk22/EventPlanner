@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventDto {
+public class EventDto implements Comparable<EventDto>{
     @NotNull
     @NotEmpty
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -37,4 +37,12 @@ public class EventDto {
     String company;
 
     Long id;
+
+    Long peopleInterested;
+
+    @Override
+    public int compareTo(EventDto e){
+        return peopleInterested.compareTo(e.peopleInterested);
+    }
+
 }

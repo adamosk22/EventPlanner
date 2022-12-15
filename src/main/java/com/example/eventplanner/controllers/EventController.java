@@ -1,6 +1,5 @@
 package com.example.eventplanner.controllers;
 
-import com.example.eventplanner.dtos.ActivityDto;
 import com.example.eventplanner.dtos.EventDto;
 import com.example.eventplanner.services.EventService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,11 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     public List<EventDto> getByEmail(@PathVariable String email){ return eventService.findByEmail(email); }
 
-    @GetMapping(value="category/{category}")
+    @GetMapping(value="/category/{category}")
     @ResponseStatus(HttpStatus.OK)
     public List<EventDto> getByCategory(@PathVariable String category){ return eventService.findByCategory(category); }
+
+    @GetMapping(value="/group/{code}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventDto> getByGroup(@PathVariable String code){ return eventService.findByGroup(code); }
 }

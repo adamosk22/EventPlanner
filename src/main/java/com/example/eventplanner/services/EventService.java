@@ -3,6 +3,7 @@ package com.example.eventplanner.services;
 import com.example.eventplanner.dtos.EventDto;
 import com.example.eventplanner.entities.*;
 import com.example.eventplanner.repositories.EventRepository;
+import com.example.eventplanner.repositories.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final UserService userService;
     private final ActivityService activityService;
+    private final GroupRepository groupRepository;
 
     @Transactional
     public Event create(EventDto dto){
@@ -55,7 +59,8 @@ public class EventService {
                 event.getLocation(),
                 event.getUser().getEmail(),
                 event.getUser().getCompany(),
-                event.getId()
+                event.getId(),
+                0L
         )).collect(Collectors.toList());
     }
 
@@ -76,13 +81,8 @@ public class EventService {
     }
 
     public List<EventDto> findByEmail(String email){
-        List <Activity> activities = activityService.findActivities(email);
-        final List<Event> events = eventRepository.findAll();
-        events.removeIf(event -> (event.getStartTime().isBefore(LocalDateTime.now())));
-        for(Activity activity : activities){
-            events.removeIf(event -> (event.getStartTime().isBefore(activity.getEndTime()) && event.getEndTime().isAfter(activity.getStartTime())));
-            events.removeIf(event -> (checkRecurringOverlap(event,activity)));
-        }
+        List<Event> events = eventRepository.findAll();
+        events = findForUser(email, events);
         Collections.sort(events);
         return events.stream().map(event -> new EventDto(
                 event.getStartTime().toString(),
@@ -92,12 +92,13 @@ public class EventService {
                 event.getLocation(),
                 event.getUser().getEmail(),
                 event.getUser().getCompany(),
-                event.getId()
+                event.getId(),
+                0L
         )).collect(Collectors.toList());
     }
 
     public List<EventDto> findByCategory(String categoryName){
-        final List<Event> events = eventRepository.findByCategories_name(categoryName);
+        List<Event> events = eventRepository.findByCategories_name(categoryName);
         return events.stream().map(event -> new EventDto(
                 event.getStartTime().toString(),
                 event.getEndTime().toString(),
@@ -106,8 +107,51 @@ public class EventService {
                 event.getLocation(),
                 event.getUser().getEmail(),
                 event.getUser().getCompany(),
-                event.getId()
+                event.getId(),
+                0L
         )).collect(Collectors.toList());
+    }
+
+    public List<EventDto> findByGroup(String code) {
+        Group group = groupRepository.findByCode(code);
+        List<Event> events = new ArrayList<>();
+        Set<Category> categories = group.getCategories();
+        for(Category category: categories){
+            events.addAll(eventRepository.findByCategories_name(category.getName()));
+        }
+        events = events.stream()
+                .distinct()
+                .collect(Collectors.toList());
+        List<EventDto> recommendedEventsDto = new ArrayList<>();
+        Set<User> users = group.getUsers();
+        for(User user: users){
+            List<Event> userEvents = findForUser(user.getEmail(),events);
+            for(Event event:userEvents){
+                boolean notOnList = true;
+                for(EventDto dto: recommendedEventsDto){
+                    if(dto.getName()==event.getName()){
+                        notOnList=false;
+                        Long number = dto.getPeopleInterested();
+                        dto.setPeopleInterested(number + 1);
+                    }
+                }
+                if(notOnList){
+                    recommendedEventsDto.add(new EventDto(
+                            event.getStartTime().toString(),
+                            event.getEndTime().toString(),
+                            event.getName(),
+                            event.getDescription(),
+                            event.getLocation(),
+                            event.getUser().getEmail(),
+                            event.getUser().getCompany(),
+                            event.getId(),
+                            1L
+                    ));
+                }
+            }
+        }
+        Collections.sort(recommendedEventsDto);
+        return recommendedEventsDto;
     }
 
     private boolean checkRecurringOverlap(Event event, Activity activity){
@@ -121,5 +165,15 @@ public class EventService {
             }
         }
         return false;
+    }
+
+    List<Event> findForUser(String email, List<Event> events){
+        List <Activity> activities = activityService.findActivities(email);
+        events.removeIf(event -> (event.getStartTime().isBefore(LocalDateTime.now())));
+        for(Activity activity : activities){
+            events.removeIf(event -> (event.getStartTime().isBefore(activity.getEndTime()) && event.getEndTime().isAfter(activity.getStartTime())));
+            events.removeIf(event -> (checkRecurringOverlap(event,activity)));
+        }
+        return events;
     }
 }
