@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional()
@@ -21,7 +22,7 @@ public class CategoryService {
 
     @Transactional
     public void create(){
-        List<String> categories = Arrays.asList(new String[]{"Music", "Theatre", "Sport", "Others"});
+        List<String> categories = Arrays.asList(new String[]{"Music", "Theatre", "Sport", "Comedy", "Education", "Cinema", "Discussion", "Others"});
         categories.forEach(categoryName -> {
             Category category = new Category();
             category.setName(categoryName);
@@ -34,5 +35,11 @@ public class CategoryService {
         Category category = categoryRepository.findByName(dto.getName());
         event.getCategories().add(category);
         category.getEvents().add(event);
+    }
+
+    public List<CategoryDto> getAll(){
+        final List<Category> categories = categoryRepository.findAll();
+        return categories.stream().map(category -> (new CategoryDto(category.getName(), null, null)))
+                .collect(Collectors.toList());
     }
 }

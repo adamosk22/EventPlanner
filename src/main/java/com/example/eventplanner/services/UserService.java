@@ -57,6 +57,7 @@ public class UserService {
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setCompany(userDTO.getCompany());
         user.setRole(userDTO.getRole());
         if(user.getRole()=="ORGANIZER")
             user.setCompany(userDTO.getCompany());

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/categories")
@@ -18,4 +20,8 @@ public class CategoryController {
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public void addToEvent(@RequestBody CategoryDto categoryDto) { categoryService.addToEvent(categoryDto); }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryDto> getAll() { return categoryService.getAll(); }
 }
