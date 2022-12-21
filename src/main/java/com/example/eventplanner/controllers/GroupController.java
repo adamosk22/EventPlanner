@@ -1,6 +1,5 @@
 package com.example.eventplanner.controllers;
 
-import com.example.eventplanner.dtos.EventDto;
 import com.example.eventplanner.dtos.GroupDto;
 import com.example.eventplanner.services.GroupService;
 import lombok.RequiredArgsConstructor;

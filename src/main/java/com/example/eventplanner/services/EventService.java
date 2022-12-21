@@ -150,7 +150,7 @@ public class EventService {
                 }
             }
         }
-        Collections.sort(recommendedEventsDto);
+        Collections.sort(recommendedEventsDto, Collections.reverseOrder());
         return recommendedEventsDto;
     }
 
@@ -169,11 +169,12 @@ public class EventService {
 
     List<Event> findForUser(String email, List<Event> events){
         List <Activity> activities = activityService.findActivities(email);
-        events.removeIf(event -> (event.getStartTime().isBefore(LocalDateTime.now())));
+        List <Event> userEvents = new ArrayList<>(events);
+        userEvents.removeIf(event -> (event.getStartTime().isBefore(LocalDateTime.now())));
         for(Activity activity : activities){
-            events.removeIf(event -> (event.getStartTime().isBefore(activity.getEndTime()) && event.getEndTime().isAfter(activity.getStartTime())));
-            events.removeIf(event -> (checkRecurringOverlap(event,activity)));
+            userEvents.removeIf(event -> (event.getStartTime().isBefore(activity.getEndTime()) && event.getEndTime().isAfter(activity.getStartTime())));
+            userEvents.removeIf(event -> (checkRecurringOverlap(event,activity)));
         }
-        return events;
+        return userEvents;
     }
 }

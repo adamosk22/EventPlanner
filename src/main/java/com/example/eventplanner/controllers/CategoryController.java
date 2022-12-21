@@ -17,11 +17,19 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.CREATED)
     public void create() { categoryService.create(); }
 
-    @PatchMapping
+    @PatchMapping("/event")
     @ResponseStatus(HttpStatus.OK)
     public void addToEvent(@RequestBody CategoryDto categoryDto) { categoryService.addToEvent(categoryDto); }
+
+    @PatchMapping("/group")
+    @ResponseStatus(HttpStatus.OK)
+    public void addToGroup(@RequestBody CategoryDto categoryDto) { categoryService.addToGroup(categoryDto); }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CategoryDto> getAll() { return categoryService.getAll(); }
+
+    @GetMapping("/group/{groupName}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CategoryDto> getByEvent(@PathVariable String groupName) { return categoryService.getByGroup(groupName); }
 }

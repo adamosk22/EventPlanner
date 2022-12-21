@@ -10,4 +10,6 @@ public interface CategoryRepository extends CrudRepository<Category, Long>, Pagi
     Category findByName(String name);
 
     List<Category> findAll();
+
+    List<Category> findByGroup_name(String name);
 }

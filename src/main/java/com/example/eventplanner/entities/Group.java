@@ -13,6 +13,7 @@ import java.util.Set;
 @Entity(name = "groups")
 public class Group extends BaseEntity{
     @NotNull
+    @Column(unique = true)
     String name;
 
     String description;

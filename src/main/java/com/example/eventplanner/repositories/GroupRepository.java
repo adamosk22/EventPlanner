@@ -12,4 +12,6 @@ public interface GroupRepository extends CrudRepository<Group, Long>, PagingAndS
     Group findByCode(String code);
 
     List<Group> findByUsers_email(String email);
+
+    Group findByName(String name);
 }
