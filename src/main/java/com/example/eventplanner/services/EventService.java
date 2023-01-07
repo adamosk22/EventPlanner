@@ -39,7 +39,10 @@ public class EventService {
         event.setEndTime(endDateTime);
         event.setLocation(dto.getLocation());
         event.setDescription(dto.getDescription());
-        return eventRepository.save(event);
+        if(endDateTime.isAfter(startDateTime))
+            return eventRepository.save(event);
+        else
+            return null;
     }
 
     public Event findById(Long id){
@@ -60,7 +63,8 @@ public class EventService {
                 event.getUser().getEmail(),
                 event.getUser().getCompany(),
                 event.getId(),
-                0L
+                0L,
+                getCategories(event)
         )).collect(Collectors.toList());
     }
 
@@ -93,7 +97,8 @@ public class EventService {
                 event.getUser().getEmail(),
                 event.getUser().getCompany(),
                 event.getId(),
-                0L
+                0L,
+                getCategories(event)
         )).collect(Collectors.toList());
     }
 
@@ -108,7 +113,8 @@ public class EventService {
                 event.getUser().getEmail(),
                 event.getUser().getCompany(),
                 event.getId(),
-                0L
+                0L,
+                getCategories(event)
         )).collect(Collectors.toList());
     }
 
@@ -136,17 +142,7 @@ public class EventService {
                     }
                 }
                 if(notOnList){
-                    recommendedEventsDto.add(new EventDto(
-                            event.getStartTime().toString(),
-                            event.getEndTime().toString(),
-                            event.getName(),
-                            event.getDescription(),
-                            event.getLocation(),
-                            event.getUser().getEmail(),
-                            event.getUser().getCompany(),
-                            event.getId(),
-                            1L
-                    ));
+                    recommendedEventsDto.add(createDtoForGroup(event));
                 }
             }
         }
@@ -154,11 +150,28 @@ public class EventService {
         return recommendedEventsDto;
     }
 
+    private EventDto createDtoForGroup(Event event){
+        return new EventDto(
+                event.getStartTime().toString(),
+                event.getEndTime().toString(),
+                event.getName(),
+                event.getDescription(),
+                event.getLocation(),
+                event.getUser().getEmail(),
+                event.getUser().getCompany(),
+                event.getId(),
+                1L,
+                getCategories(event)
+        );
+    }
+
     private boolean checkRecurringOverlap(Event event, Activity activity){
         if(activity.getRecurring()){
             if(event.getStartTime().getDayOfWeek()==activity.getStartTime().getDayOfWeek()){
-                if(event.getStartTime().getHour() <= activity.getEndTime().getHour() && event.getEndTime().getHour()>=activity.getStartTime().getHour()){
-                    if(event.getStartTime().getMinute() <= activity.getEndTime().getMinute() && event.getEndTime().getMinute()>=activity.getStartTime().getMinute()){
+                if(event.getStartTime().getHour() <= activity.getEndTime().getHour() &&
+                        event.getEndTime().getHour()>=activity.getStartTime().getHour()){
+                    if(event.getStartTime().getMinute() <= activity.getEndTime().getMinute()
+                            && event.getEndTime().getMinute()>=activity.getStartTime().getMinute()){
                         return true;
                     }
                 }
@@ -172,9 +185,24 @@ public class EventService {
         List <Event> userEvents = new ArrayList<>(events);
         userEvents.removeIf(event -> (event.getStartTime().isBefore(LocalDateTime.now())));
         for(Activity activity : activities){
-            userEvents.removeIf(event -> (event.getStartTime().isBefore(activity.getEndTime()) && event.getEndTime().isAfter(activity.getStartTime())));
+            userEvents.removeIf(event -> ((!activity.getName().equals(event.getName())) &&
+                    event.getStartTime().isBefore(activity.getEndTime()) &&
+                    event.getEndTime().isAfter(activity.getStartTime())));
             userEvents.removeIf(event -> (checkRecurringOverlap(event,activity)));
         }
         return userEvents;
+    }
+
+    String getCategories(Event event){
+        Set <Category> categories = event.getCategories();
+        String categoryString = "";
+        for(Category category: categories){
+            categoryString += category.getName();
+            categoryString += ", ";
+        }
+        if (categoryString != null && categoryString.length() > 0) {
+            categoryString = categoryString.substring(0, categoryString.length() - 2);
+        }
+        return categoryString;
     }
 }

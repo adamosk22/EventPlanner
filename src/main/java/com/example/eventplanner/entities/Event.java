@@ -28,11 +28,6 @@ public class Event extends BaseEntity implements Comparable<Event>{
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name="calendar_id")
-    Calendar calendar;
-
-    @NotNull
-    @ManyToOne
     @JoinColumn(name="user_id")
     User user;
 

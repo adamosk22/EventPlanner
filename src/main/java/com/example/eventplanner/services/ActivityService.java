@@ -36,7 +36,10 @@ public class ActivityService {
         activity.setEndTime(endDateTime);
         activity.setRecurring(dto.getRecurring());
         activity.setIsEvent(dto.getIsEvent());
-        return activityRepository.save(activity);
+        if(endDateTime.isAfter(startDateTime))
+            return activityRepository.save(activity);
+        else
+            return null;
     }
 
     @Transactional

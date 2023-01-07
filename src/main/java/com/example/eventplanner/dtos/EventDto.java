@@ -40,6 +40,8 @@ public class EventDto implements Comparable<EventDto>{
 
     Long peopleInterested;
 
+    String categories;
+
     @Override
     public int compareTo(EventDto e){
         return peopleInterested.compareTo(e.peopleInterested);

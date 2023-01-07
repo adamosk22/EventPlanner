@@ -1,12 +1,9 @@
 package com.example.eventplanner.services;
 
 import com.example.eventplanner.dtos.GroupDto;
-import com.example.eventplanner.entities.Activity;
-import com.example.eventplanner.entities.Calendar;
 import com.example.eventplanner.entities.Group;
 import com.example.eventplanner.entities.User;
 import com.example.eventplanner.repositories.GroupRepository;
-import com.example.eventplanner.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +37,8 @@ public class GroupService {
     public GroupDto joinGroup(GroupDto dto){
         User user = userService.findByEmail(dto.getUserEmail());
         Group group = groupRepository.findByCode(dto.getCode());
-        if(group!=null) {
+        Set<User> members = group.getUsers();
+        if(group!=null && !members.contains(user)) {
             group.getUsers().add(user);
             user.getGroups().add(group);
             return new GroupDto(
@@ -71,10 +69,15 @@ public class GroupService {
         int targetStringLength = 8;
         Random random = new Random();
 
-        return random.ints(leftLimit, rightLimit + 1)
+        String code = random.ints(leftLimit, rightLimit + 1)
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
                 .limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
+
+        if(groupRepository.existsGroupByCode(code))
+            return generateGroupCode();
+        else
+            return code;
     }
 }

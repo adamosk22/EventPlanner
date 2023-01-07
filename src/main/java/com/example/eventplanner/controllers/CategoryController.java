@@ -31,5 +31,5 @@ public class CategoryController {
 
     @GetMapping("/group/{groupName}")
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryDto> getByEvent(@PathVariable String groupName) { return categoryService.getByGroup(groupName); }
+    public List<CategoryDto> getByGroup(@PathVariable String groupName) { return categoryService.getByGroup(groupName); }
 }
